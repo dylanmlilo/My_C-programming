@@ -4,31 +4,36 @@ void sig_handler(int sig);
 int execute(char **args, char **front);
 
 /**
- * sig_handler - Prints a new prompt upon a signal.
- * @sig: The signal.
+ * sig_handler - function that prints a new prompt upon a signal
+ * @sig: signal
  */
+
 void sig_handler(int sig)
 {
 	char *new_prompt = "\n#cisfun$ ";
 
 	(void)sig;
 	signal(SIGINT, sig_handler);
-	write(STDIN_FILENO, new_prompt, 10);
+	write(STDIN_FILENO, new_prompt, 20);
 }
 
 /**
- * execute - Executes a command in a child process.
- * @args: An array of arguments.
- * @front: A double pointer to the beginning of args.
+ * execute - function that executes a command in a child process
  *
- * Return: If an error occurs - a corresponding error code.
- *         O/w - The exit value of the last executed command.
+ * @args: array of arguments
+ * @front: double pointer to the beginning of arguments
+ *
+ * Return: A corresponding error code if an error occurs
+ *         else the exit value of the last executed command
  */
+
 int execute(char **args, char **front)
 {
 	pid_t child_pid;
-	int status, flag = 0, ret = 0;
+	int flag, status, ret;
 	char *command = args[0];
+
+	flag = status = 0;
 
 	if (command[0] != '/' && command[0] != '.')
 	{
@@ -75,17 +80,21 @@ int execute(char **args, char **front)
 }
 
 /**
- * main - Runs a simple UNIX command interpreter.
- * @argc: The number of arguments supplied to the program.
- * @argv: An array of pointers to the arguments.
+ * main - function that runs a simple UNIX command interpreter
  *
- * Return: The return value of the last executed command.
+ * @argc: number of arguments
+ * @argv: arguments vector
+ *
+ * Return: the return value of the last executed command
  */
+
 int main(int argc, char *argv[])
 {
-	int ret = 0, retn;
-	int *exe_ret = &retn;
+	int ret , rein;
+	int *exe_ret = &rein;
 	char *prompt = "#cisfun$ ", *new_line = "\n";
+
+	ret = 0;
 
 	name = argv[0];
 	hist = 1;

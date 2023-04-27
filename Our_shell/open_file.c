@@ -7,58 +7,62 @@ char **_strtok(char *line, char *delim);
 int proc_file_commands(char *file_path, int *exe_ret);
 
 /**
- * cant_open - If the file doesn't exist or lacks proper permissions, print
- * a cant open error.
- * @file_path: Path to the supposed file.
+ * cant_open - function that prints can't open error if the
+ *             file doesn't exist or lacks proper permissions
  *
- * Return: 127.
+ * @file_path: the path to the supposed file
+ *
+ * Return: 127
  */
 
 int cant_open(char *file_path)
 {
-	char *error, *hist_str;
-	int len;
+	char *error, *history_str;
+	int length;
 
-	hist_str = _itoa(hist);
-	if (!hist_str)
+	history_str = _itoa(hist);
+	if (!history_str)
 		return (127);
 
-	len = _strlen(name) + _strlen(hist_str) + _strlen(file_path) + 16;
-	error = malloc(sizeof(char) * (len + 1));
+	length = _strlen(name) + _strlen(history_str) + _strlen(file_path) + 16;
+	error = malloc(sizeof(char) * (length + 1));
+	
 	if (!error)
 	{
-		free(hist_str);
+		free(history_str);
 		return (127);
 	}
 
 	_strcpy(error, name);
 	_strcat(error, ": ");
-	_strcat(error, hist_str);
+	_strcat(error, history_str);
 	_strcat(error, ": Can't open ");
 	_strcat(error, file_path);
 	_strcat(error, "\n");
 
-	free(hist_str);
-	write(STDERR_FILENO, error, len);
+	free(history_str);
+	write(STDERR_FILENO, error, length);
 	free(error);
 	return (127);
 }
 
 /**
- * proc_file_commands - Takes a file and attempts to run the commands stored
- * within.
- * @file_path: Path to the file.
- * @exe_ret: Return value of the last executed command.
+ * proc_file_commands - function that takes a file and attempts
+                        to run the commands stored within
+
+ * @file_path: path to the file
+ * @exe_ret: the return value of the last executed command
  *
- * Return: If file couldn't be opened - 127.
- *   If malloc fails - -1.
- *   Otherwise the return value of the last command ran.
+ * Return: 127 if file couldn't be opened
+ *         -1 if malloc fails
+ *         else the return value of the last command ran.
  */
+
 int proc_file_commands(char *file_path, int *exe_ret)
 {
-	ssize_t file, b_read, i;
+	ssize_t i, b_read, file;
 	unsigned int line_size = 0;
-	unsigned int old_size = 120;
+	unsigned int init_size = 120;
 	char *line, **args, **front;
 	char buffer[120];
 	int ret;
@@ -70,7 +74,7 @@ int proc_file_commands(char *file_path, int *exe_ret)
 		*exe_ret = cant_open(file_path);
 		return (*exe_ret);
 	}
-	line = malloc(sizeof(char) * old_size);
+	line = malloc(sizeof(char) * init_size);
 	if (!line)
 		return (-1);
 	do {
@@ -79,9 +83,9 @@ int proc_file_commands(char *file_path, int *exe_ret)
 			return (*exe_ret);
 		buffer[b_read] = '\0';
 		line_size += b_read;
-		line = _realloc(line, old_size, line_size);
+		line = _realloc(line, init_size, line_size);
 		_strcat(line, buffer);
-		old_size = line_size;
+		init_size = line_size;
 	} while (b_read);
 	for (i = 0; line[i] == '\n'; i++)
 		line[i] = ' ';
@@ -127,100 +131,108 @@ int proc_file_commands(char *file_path, int *exe_ret)
 }
 
 /**
- * token_len - Locates the delimiter index marking the end
- *             of the first token contained within a string.
- * @str: The string to be searched.
- * @delim: The delimiter character.
+ * token_len - function that locates the delimiter index marking
+ *             the end of the first token contained within a string
  *
- * Return: The delimiter index marking the end of
- *         the intitial token pointed to be str.
+ * @str: string to be searched
+ * @delim: the delimiter character
+ *
+ * Return: the delimiter index
  */
+
 int token_len(char *str, char *delim)
 {
-	int index = 0, len = 0;
+	int i , length;
 
-	while (*(str + index) && *(str + index) != *delim)
+	i = length = 0;
+
+	while (*(str + i) && *(str + i) != *delim)
 	{
-		len++;
-		index++;
+		length++;
+		i++;
 	}
-
-	return (len);
+	return (length);
 }
 
 /**
- * count_tokens - Counts the number of delimited
- *                words contained within a string.
- * @str: The string to be searched.
- * @delim: The delimiter character.
+ * count_tokens - function that counts the number of 
+ *                delimited words contained within a string
  *
- * Return: The number of words contained within str.
+ * @str: the string to be searched
+ * @delim: the delimiter character
+ *
+ * Return: the number of words contained within str
  */
+
 int count_tokens(char *str, char *delim)
 {
-	int index, tokens = 0, len = 0;
+	int i, length , token;
 
-	for (index = 0; *(str + index); index++)
-		len++;
+	length = token = 0;
 
-	for (index = 0; index < len; index++)
+	for (i = 0; *(str + i); i++)
+		length++;
+
+	for (i = 0; i < length; i++)
 	{
-		if (*(str + index) != *delim)
+		if (*(str + i) != *delim)
 		{
-			tokens++;
-			index += token_len(str + index, delim);
+			token++;
+			i += token_len(str + i, delim);
 		}
 	}
-
-	return (tokens);
+	return (token);
 }
 
 /**
- * _strtok - Tokenizes a string.
- * @line: The string.
- * @delim: The delimiter character to tokenize the string by.
+ * _strtok - function that tokenizes a string
  *
- * Return: A pointer to an array containing the tokenized words.
+ * @line: the string ti be tokenized
+ * @delim: delimiter character used to tokenize the string
+ *
+ * Return: pointer to an array containing the tokenized words
  */
+
 char **_strtok(char *line, char *delim)
 {
 	char **ptr;
-	int index = 0, tokens, t, letters, l;
+	int i , j, k, token, words;
 
-	tokens = count_tokens(line, delim);
-	if (tokens == 0)
+	i = 0;
+
+	token = count_tokens(line, delim);
+	if (token == 0)
 		return (NULL);
 
-	ptr = malloc(sizeof(char *) * (tokens + 2));
+	ptr = malloc(sizeof(char *) * (token + 2));
 	if (!ptr)
 		return (NULL);
 
-	for (t = 0; t < tokens; t++)
+	for (j = 0; j < token; j++)
 	{
-		while (line[index] == *delim)
-			index++;
+		while (line[i] == *delim)
+			i++;
 
-		letters = token_len(line + index, delim);
+		words = token_len(line + i, delim);
 
-		ptr[t] = malloc(sizeof(char) * (letters + 1));
-		if (!ptr[t])
+		ptr[j] = malloc(sizeof(char) * (words + 1));
+		if (!ptr[j])
 		{
-			for (index -= 1; index >= 0; index--)
-				free(ptr[index]);
+			for (i = i - 1; i >= 0; i--)
+				free(ptr[i]);
 			free(ptr);
 			return (NULL);
 		}
 
-		for (l = 0; l < letters; l++)
+		for (k = 0; k < words; k++)
 		{
-			ptr[t][l] = line[index];
-			index++;
+			ptr[j][k] = line[i];
+			i++;
 		}
-
-		ptr[t][l] = '\0';
+		ptr[j][k] = '\0';
 	}
-	ptr[t] = NULL;
-	ptr[t + 1] = NULL;
+	ptr[j] = NULL;
+	ptr[j + 1] = NULL;
 
 	return (ptr);
 }
